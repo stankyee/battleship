@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Battleship Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Battleship Multiplayer</h1>
+
+  <div id="ship-container">
+    <h2>Place Your Ships</h2>
+    <div id="ships">
+      <div class="ship-wrapper"><div class="ship" draggable="true" data-length="5" data-orientation="horizontal"></div></div>
+      <div class="ship-wrapper"><div class="ship" draggable="true" data-length="4" data-orientation="horizontal"></div></div>
+      <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
+      <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
+      <div class="ship-wrapper"><div class="ship" draggable="true" data-length="2" data-orientation="horizontal"></div></div>
+    </div>
+    <button id="rotate-btn">Rotate (Horizontal)</button>
+    <button id="start-btn" disabled>Start Game</button>
+  </div>
+
+  <div class="boards">
+    <div>
+      <h2>Your Board</h2>
+      <div id="player-board" class="board"></div>
+    </div>
+    <div>
+      <h2>Enemy Board</h2>
+      <div id="enemy-board" class="board"></div>
+    </div>
+  </div>
+
+  <p id="status">Place your ships...</p>
+
+  <!-- Game Over Modal -->
+<div id="game-over-modal" class="hidden">
+  <div id="game-over-message"></div>
+  <!-- <button id="play-again-btn">Play Again</button> -->
+</div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

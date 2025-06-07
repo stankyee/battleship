@@ -1,0 +1,184 @@
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  margin-top: 20px;
+}
+
+#player-board, #enemy-board {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  gap: 1px;
+  justify-content: center;
+  margin: 10px auto;
+  width: fit-content;
+  border: 2px solid #444;
+  background-color: #eee;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.cell.ship {
+  background-color: #333;
+}
+
+.cell.preview {
+  background-color: rgba(0, 128, 0, 0.3);
+}
+
+.cell.hit {
+  background-color: red;
+}
+
+.cell.miss {
+  background-color: #999;
+}
+
+.board-wrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+/* Base ship style */
+.ship {
+  background-color: #666;
+  margin: 5px;
+  cursor: grab;
+  display: block;
+  position: relative;
+}
+
+/* Horizontal ships */
+.ship[data-orientation="horizontal"][data-length="2"] {
+  width: 60px;
+  height: 30px;
+}
+.ship[data-orientation="horizontal"][data-length="3"] {
+  width: 90px;
+  height: 30px;
+}
+.ship[data-orientation="horizontal"][data-length="4"] {
+  width: 120px;
+  height: 30px;
+}
+.ship[data-orientation="horizontal"][data-length="5"] {
+  width: 150px;
+  height: 30px;
+}
+
+/* Vertical ships */
+.ship[data-orientation="vertical"][data-length="2"] {
+  width: 30px;
+  height: 60px;
+}
+.ship[data-orientation="vertical"][data-length="3"] {
+  width: 30px;
+  height: 90px;
+}
+.ship[data-orientation="vertical"][data-length="4"] {
+  width: 30px;
+  height: 120px;
+}
+.ship[data-orientation="vertical"][data-length="5"] {
+  width: 30px;
+  height: 150px;
+}
+
+#ship-container {
+  margin: 20px auto;
+}
+
+button {
+  margin: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#status {
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.board {
+  margin: 10px;
+}
+
+#ships {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.ship-wrapper {
+  position: relative;
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Game Over Modal Styles */
+#game-over-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1000;
+  color: white;
+  font-size: 3em;
+  font-weight: bold;
+}
+
+#game-over-modal.hidden {
+  display: none;
+}
+
+#game-over-message {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#play-again-btn {
+  font-size: 1.2em;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+#play-again-btn:hover {
+  background-color: #45a049;
+}
+
+/* Dim background content when modal is active */
+body.modal-active > *:not(#game-over-modal) {
+  filter: blur(3px) brightness(0.5);
+  pointer-events: none; /* prevent clicks */
+  user-select: none;
+}
