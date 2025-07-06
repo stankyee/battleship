@@ -2,7 +2,6 @@ const socket = io();
 
 const playerBoard = document.getElementById("player-board");
 const enemyBoard = document.getElementById("enemy-board");
-const ships = document.querySelectorAll(".ship");
 const rotateButton = document.getElementById("rotate-btn");
 const startButton = document.getElementById("start-btn");
 const statusText = document.getElementById("status");
@@ -46,10 +45,10 @@ let isPlayerTurn = false;
 let gameStarted = false;
 let shipDragOffset = 0;
 
-// === Create Boards ===
+// === Board Creation ===
 function createBoard(container, cellsArray, isEnemy = false) {
-  container.innerHTML = ""; // Clear any existing cells
-  cellsArray.length = 0; // Clear array
+  container.innerHTML = "";
+  cellsArray.length = 0;
 
   for (let i = 0; i < 100; i++) {
     const cell = document.createElement("div");
@@ -80,13 +79,13 @@ function createBoard(container, cellsArray, isEnemy = false) {
   }
 }
 
+// === Ship Placement ===
 function placeShip(startIdx) {
   if (!currentShip) return;
 
   const length = currentShipLength;
   const indices = [];
 
-  // Adjust for offset
   startIdx = currentOrientation === "horizontal"
     ? startIdx - shipDragOffset
     : startIdx - shipDragOffset * 10;
@@ -126,14 +125,13 @@ function placeShip(startIdx) {
     socket.emit("ready");
   }
 
-  totalShipCells += indices.length; // Count placed ship cells
+  totalShipCells += indices.length;
 }
 
 function highlightPreview(cell, boardCells, length, orientation) {
   clearPreview(boardCells);
   let startIdx = parseInt(cell.dataset.index);
 
-  // Adjust for offset
   startIdx = orientation === "horizontal"
     ? startIdx - shipDragOffset
     : startIdx - shipDragOffset * 10;
@@ -163,22 +161,7 @@ function clearPreview(boardCells) {
   boardCells.forEach(cell => cell.classList.remove("preview"));
 }
 
-// === Drag Events ===
-ships.forEach(ship => {
-  ship.addEventListener("dragstart", e => {
-    currentShip = ship;
-    currentShipLength = parseInt(ship.dataset.length);
-
-    const rect = ship.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    shipDragOffset = currentOrientation === "horizontal"
-      ? Math.floor(x / 30)
-      : Math.floor(y / 30);
-  });
-});
-
+// === Rotation ===
 rotateButton.addEventListener("click", () => {
   currentOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
   rotateButton.textContent = `Rotate (${currentOrientation.charAt(0).toUpperCase()}${currentOrientation.slice(1)})`;
@@ -275,26 +258,78 @@ socket.on("game-over", () => {
   gameStarted = false;
 });
 
-// === Play Again Logic ===
+// === Play Again ===
 playAgainBtn.addEventListener("click", () => {
   socket.emit("reset");
   resetGame();
-  hideEndMessage();
 });
 
 socket.on("game-reset", () => {
   resetGame();
-  hideEndMessage();
 });
 
-// === Helper Functions ===
+// === Game Reset & Helpers ===
+function resetGame() {
+  resetGameState();
+  resetUI();
+  initializeShips();
+  createBoard(playerBoard, playerCells);
+  createBoard(enemyBoard, enemyCells, true);
+}
+
+function resetGameState() {
+  placedShips = 0;
+  totalShipCells = 0;
+  playerHits = 0;
+  enemyHits = 0;
+  isPlayerTurn = false;
+  gameStarted = false;
+  currentShip = null;
+  currentShipLength = 0;
+  shipDragOffset = 0;
+  startButton.disabled = true;
+}
+
+function resetUI() {
+  hideEndMessage();
+  statusText.textContent = "Place your ships...";
+  document.body.style.pointerEvents = "auto";
+  currentOrientation = "horizontal";
+  rotateButton.textContent = "Rotate (Horizontal)";
+}
+
+function initializeShips() {
+  const shipsContainer = document.getElementById("ships");
+
+  shipsContainer.innerHTML = `
+    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="5" data-orientation="horizontal"></div></div>
+    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="4" data-orientation="horizontal"></div></div>
+    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
+    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
+    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="2" data-orientation="horizontal"></div></div>
+  `;
+
+  document.querySelectorAll(".ship").forEach(ship => {
+    ship.addEventListener("dragstart", e => {
+      currentShip = ship;
+      currentShipLength = parseInt(ship.dataset.length);
+
+      const rect = ship.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      shipDragOffset = currentOrientation === "horizontal"
+        ? Math.floor(x / 30)
+        : Math.floor(y / 30);
+    });
+  });
+}
 
 function showEndMessage(message) {
   statusText.textContent = message;
   overlay.style.display = "block";
   playAgainBtn.style.display = "block";
-  // Make everything except overlay and message opaque
-  document.body.style.pointerEvents = "none"; // disable interactions
+  document.body.style.pointerEvents = "none";
   overlay.style.pointerEvents = "auto";
   playAgainBtn.style.pointerEvents = "auto";
   statusText.style.position = "fixed";
@@ -309,58 +344,11 @@ function showEndMessage(message) {
 function hideEndMessage() {
   overlay.style.display = "none";
   playAgainBtn.style.display = "none";
-  statusText.style.position = "";
-  statusText.style.top = "";
-  statusText.style.left = "";
-  statusText.style.transform = "";
-  statusText.style.fontSize = "";
-  statusText.style.color = "";
-  statusText.style.zIndex = "";
+  statusText.style = "";
   statusText.textContent = "Place your ships...";
-  document.body.style.pointerEvents = "auto";
-  placedShips = 0;
-  totalShipCells = 0;
-  playerHits = 0;
-  enemyHits = 0;
-  isPlayerTurn = false;
-  gameStarted = false;
-  startButton.disabled = true;
+}
 
-  // Reset ships container (re-add ships)
-  const shipsContainer = document.getElementById("ships");
-  shipsContainer.innerHTML = `
-    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="5" data-orientation="horizontal"></div></div>
-    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="4" data-orientation="horizontal"></div></div>
-    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
-    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="3" data-orientation="horizontal"></div></div>
-    <div class="ship-wrapper"><div class="ship" draggable="true" data-length="2" data-orientation="horizontal"></div></div>
-  `;
-
-  // Re-assign drag events to new ships
-  const newShips = document.querySelectorAll(".ship");
-  newShips.forEach(ship => {
-    ship.addEventListener("dragstart", e => {
-      currentShip = ship;
-      currentShipLength = parseInt(ship.dataset.length);
-
-      const rect = ship.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      shipDragOffset = currentOrientation === "horizontal"
-        ? Math.floor(x / 30)
-        : Math.floor(y / 30);
-    });
-  });
-
-  createBoard(playerBoard, playerCells);
-  createBoard(enemyBoard, enemyCells, true);
-
-  // Reset orientation and rotate button text
-  currentOrientation = "horizontal";
-  rotateButton.textContent = "Rotate (Horizontal)";
-};
-
-// === INIT ===
+// === Init ===
+initializeShips();
 createBoard(playerBoard, playerCells);
 createBoard(enemyBoard, enemyCells, true);
