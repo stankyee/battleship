@@ -2,12 +2,17 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #f4f4f4;
+  background-color: #000000;
   margin: 0;
   padding: 0;
 }
 
+h1 {
+  color: #ffffff;
+}
+
 h2 {
+  color: #ffffff;
   margin-top: 20px;
 }
 
@@ -19,19 +24,19 @@ h2 {
   justify-content: center;
   margin: 10px auto;
   width: fit-content;
-  border: 2px solid #444;
-  background-color: #eee;
+  border: 1px solid #dadada;
+  background-color: #181818;
 }
 
 .cell {
   width: 30px;
   height: 30px;
-  background-color: #fff;
+  background-color: #1b1b1b;
   border: 1px solid #ccc;
 }
 
 .cell.ship {
-  background-color: #333;
+  background-color: #ddcfb6;
 }
 
 .cell.preview {
@@ -54,7 +59,7 @@ h2 {
 
 /* Base ship style */
 .ship {
-  background-color: #666;
+  background-color: #ddcfb6;
   margin: 5px;
   cursor: grab;
   display: block;
@@ -120,7 +125,6 @@ button {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
   max-width: 500px;
   margin: 0 auto;
 }
